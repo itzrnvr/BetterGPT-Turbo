@@ -131,3 +131,103 @@ export const submitShareGPT = async (body: ShareGPTSubmitBodyInterface) => {
   const url = `https://shareg.pt/${id}`;
   window.open(url, '_blank');
 };
+
+
+
+export const getTextToSpeech = async (
+  text: string,
+  apiKey: string,
+  signal: AbortSignal
+) => {
+  const endpoint = 'https://api.openai.com/v1/audio/speech';
+  
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiKey}`,
+  };
+  
+  const fetchOptions: RequestInit = {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model: 'tts-1',
+      input: text,
+      voice: "alloy",
+      response_format: 'mp3',
+      stream: true,
+    }),
+    signal,
+  };
+  
+  const response = await fetch(endpoint, fetchOptions);
+  
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status}, ${await response.text()}`);
+  }
+  
+  return response
+};
+
+
+// export const getTextToSpeech = async (
+//   text: string,
+//   apiKey: string,
+//   signal: AbortSignal
+// ): Promise<Blob> => {
+//   const endpoint = 'https://api.openai.com/v1/audio/speech';
+
+//   const headers: HeadersInit = {
+//     'Content-Type': 'application/json',
+//     Authorization: `Bearer ${apiKey}`
+//   };
+
+//   const fetchOptions: RequestInit = {
+//     method: 'POST',
+//     headers,
+//     body: JSON.stringify({
+//       model: 'tts-1-hd',
+//       input: text,
+//       voice: "alloy",
+//       stream: true
+//     }),
+//     signal
+//   };
+
+//   // Call the Fetch API with the provided options
+//   const response = await fetch(endpoint, fetchOptions);
+
+//   // Throw an error if the response is not ok
+//   if (!response.ok) {
+//     throw new Error(`Error: ${response.status}, ${await response.text()}`);
+//   }
+
+//   // Handle the Response as a readable stream
+//   const reader = response.body?.getReader();
+//   if (!reader) {
+//     throw new Error('Streamed response is not available.');
+//   }
+
+//   // Building the chunks into an audio blob as before
+//   const chunks: Uint8Array[] = [];
+//   let totalLength = 0;
+//   while (true) {
+//     const { value, done } = await reader.read();
+//     if (done) break;
+//     chunks.push(value);
+//     totalLength += value.length;
+//     console.log(value)
+//   }
+
+//   // Combine the chunks into a single Uint8Array
+//   const allChunks = new Uint8Array(totalLength);
+//   let position = 0;
+//   for (const chunk of chunks) {
+//     allChunks.set(chunk, position);
+//     position += chunk.length;
+//   }
+
+//   // Create a Blob from the combined Uint8Array and return
+//   const audioBlob = new Blob([allChunks.buffer], { type: 'audio/mpeg' });
+//   return audioBlob;
+// };
+

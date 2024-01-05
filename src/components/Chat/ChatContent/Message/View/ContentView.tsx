@@ -32,6 +32,8 @@ import DeleteButton from './Button/DeleteButton';
 import MarkdownModeButton from './Button/MarkdownModeButton';
 
 import CodeBlock from '../CodeBlock';
+import TextToSpeechButton from './Button/TextToSpeechButton';
+import useTTS from '@hooks/useTTS';
 
 const ContentView = memo(
   ({
@@ -46,6 +48,7 @@ const ContentView = memo(
     messageIndex: number;
   }) => {
     const { handleSubmit } = useSubmit();
+    const {isPlaying, convertChatMessageToSpeech} = useTTS();
 
     const [isDelete, setIsDelete] = useState<boolean>(false);
 
@@ -103,6 +106,10 @@ const ContentView = memo(
       navigator.clipboard.writeText(content);
     };
 
+    const handleTTS = () => {
+      convertChatMessageToSpeech(content)
+    }
+
     return (
       <>
         <div className='markdown prose w-full md:max-w-full break-words dark:prose-invert dark share-gpt-message'>
@@ -143,10 +150,13 @@ const ContentView = memo(
                 messageIndex === lastMessageIndex && (
                   <RefreshButton onClick={handleRefresh} />
                 )}
+
+              <TextToSpeechButton playing={isPlaying} onClick={handleTTS}/>
               {messageIndex !== 0 && <UpButton onClick={handleMoveUp} />}
               {messageIndex !== lastMessageIndex && (
                 <DownButton onClick={handleMoveDown} />
               )}
+            
 
               <MarkdownModeButton />
               <CopyButton onClick={handleCopy} />
