@@ -150,7 +150,7 @@ export const getTextToSpeech = async (
     method: 'POST',
     headers,
     body: JSON.stringify({
-      model: 'tts-1',
+      model: 'tts-1-hd',
       input: text,
       voice: "alloy",
       response_format: 'mp3',
